@@ -1,0 +1,36 @@
+.custom_button {
+    border-radius: 0px !important;
+    background-color: rgba(60, 223, 31, 1) !important;
+    color: black !important;
+    font-weight: bold !important;
+    padding: 10px 20px !important;
+    float: right;
+    border: none !important;
+  }
+  
+  .custom_table thead {
+    background-color: rgba(60, 223, 31, 1) !important;
+    color: black;
+  }
+  
+  .custom_table td {
+    vertical-align: middle;
+  }
+  
+  .custom_table {
+    font-size: 12px;
+  }
+  
+  .team_logo {
+    height: 30px;
+    width: 30px;
+    display: inline-block;
+    margin-right: 10px;
+  }
+  
+  .team_cell {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: none;
+  }
