@@ -114,7 +114,9 @@ function so_scraper(config) {
           .trim();
 
         match.team1.logo =
-          'https://rical-images.s3.amazonaws.com/team-logos/mlb/' +
+          'https://rical-images.s3.amazonaws.com/team-logos/' +
+          category.toLowerCase() +
+          '/' +
           match.team1.code +
           '.png';
 
@@ -137,7 +139,9 @@ function so_scraper(config) {
           .trim();
 
         match.team2.logo =
-          'https://rical-images.s3.amazonaws.com/team-logos/mlb/' +
+          'https://rical-images.s3.amazonaws.com/team-logos/' +
+          category.toLowerCase() +
+          '/' +
           match.team2.code +
           '.png';
 
@@ -343,6 +347,10 @@ function so_scraper(config) {
   }
 
   function insertDatabase(game, match, match_data) {
+    const current_time = moment()
+      .tz('America/New_York')
+      .format('YYYY-MM-DDTHH:mm:ss');
+
     let spread_data = match_data.spread_data
       ? JSON.parse(match_data.spread_data)
       : {};
@@ -353,7 +361,7 @@ function so_scraper(config) {
       ? JSON.parse(match_data.moneyline_data)
       : {};
 
-    const sql = `INSERT INTO dbo.BettingSplits(MatchId, Sport, TeamCode, TeamName, TeamLogo, GameTime, Spread, SpreadBets, SpreadHandled, Total, TotalBets, TotalHandled, Moneyline, MoneylineBets, MoneylineHandled, Source) VALUES (
+    const sql = `INSERT INTO dbo.BettingSplits(MatchId, Sport, TeamCode, TeamName, TeamLogo, GameTime, Spread, SpreadBets, SpreadHandled, Total, TotalBets, TotalHandled, Moneyline, MoneylineBets, MoneylineHandled, Source, CreatedAt) VALUES (
       '${match.match_id}',
       '${game.name}',
       '${match_data.code}',
@@ -369,7 +377,8 @@ function so_scraper(config) {
       '${moneyline_data.moneyline || 0}',
       '${moneyline_data.moneyline_bets || 0}',
       '${moneyline_data.moneyline_handled || 0}',
-      'Scores&Odds')`;
+      'Scores&Odds',
+      '${current_time}')`;
 
     executeSQL(sql, (err, data) => {
       if (err) {
@@ -382,6 +391,10 @@ function so_scraper(config) {
   }
 
   function updateDatabase(game, match, match_data) {
+    const current_time = moment()
+      .tz('America/New_York')
+      .format('YYYY-MM-DDTHH:mm:ss');
+
     let spread_data = match_data.spread_data
       ? JSON.parse(match_data.spread_data)
       : {};
@@ -393,6 +406,7 @@ function so_scraper(config) {
       : {};
 
     const sql = `UPDATE dbo.BettingSplits SET 
+      UpdatedAt = '${current_time}',
       Spread = '${spread_data.spread || 0}',
       SpreadBets = '${spread_data.spread_bets || 0}',
       SpreadHandled = '${spread_data.spread_handled || 0}',
@@ -405,7 +419,7 @@ function so_scraper(config) {
         moneyline_data.moneyline_handled || 0
       }' WHERE MatchId='${match.match_id}' AND TeamCode ='${
       match_data.code
-    }' AND Source = 'Scores&Odds'`;
+    }' AND Sport='${game.name}' AND Source = 'Scores&Odds'`;
 
     executeSQL(sql, (err, data) => {
       if (err) {
@@ -441,7 +455,7 @@ function so_scraper(config) {
       (function (i) {
         var match = matches[i];
         var game = matches[i].game;
-        const sql_1 = `SELECT * FROM BettingSplits WHERE MatchId = '${match.match_id}' AND TeamCode = '${match.team1.code}' AND Source = 'Scores&Odds'`;
+        const sql_1 = `SELECT * FROM BettingSplits WHERE MatchId = '${match.match_id}' AND TeamCode = '${match.team1.code}' AND Sport='${game.name}' AND Source = 'Scores&Odds'`;
         executeSQL(sql_1, (err, { rowCount, rows }) => {
           if (err) console.error(err);
           if (rowCount) {
@@ -453,7 +467,7 @@ function so_scraper(config) {
           }
         });
 
-        const sql_2 = `SELECT * FROM BettingSplits WHERE MatchId = '${match.match_id}' AND TeamCode = '${match.team2.code}' AND Source = 'Scores&Odds'`;
+        const sql_2 = `SELECT * FROM BettingSplits WHERE MatchId = '${match.match_id}' AND TeamCode = '${match.team2.code}' AND Sport='${game.name}' AND Source = 'Scores&Odds'`;
         executeSQL(sql_2, (err, { rowCount, rows }) => {
           if (err) console.error(err);
           if (rowCount) {

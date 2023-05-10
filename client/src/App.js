@@ -1,7 +1,6 @@
 import 'font-awesome/css/font-awesome.min.css';
 import "react-toastify/dist/ReactToastify.css";
 import './App.css';
-import { RequireAuth, RequireAdminAuth } from './context/AuthContext';
 import { FilterContextProvider } from './context/FilterContext';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
