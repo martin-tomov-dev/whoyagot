@@ -175,7 +175,9 @@ function Datatable(props) {
                         borderBottom: '1px solid #757575',
                       }}
                     >
-                      {new Date(match_detail.GameTime).toDateString()}
+                      {new Date(match_detail.GameTime)
+                        .toDateString()
+                        .slice(0, -5)}
                     </td>
                   )}
                   <td className={classes.team_cell}>
@@ -190,7 +192,7 @@ function Datatable(props) {
                         })`,
                       }}
                     ></div>
-                    <b>{match_detail.TeamName}</b>
+                    <b>{match_detail.TeamCode}</b>
                   </td>
                   <td className="text-center fw-bold">{match_detail.Spread}</td>
                   <td className="text-center">{match_detail.SpreadBets}</td>

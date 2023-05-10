@@ -109,11 +109,11 @@ const config = {
 // Set cron job for the scrapers
 cron.schedule('0 */20 * * * *', () => {
   const scheduler_mins = new Date().getMinutes();
-  if (scheduler_mins < 20) {
-    vsin_scraper.vsin_scraper(config);
-  } else if (scheduler_mins < 40) {
+  if (scheduler_mins >= 0 && scheduler_mins < 20) {
     yahoo_scraper.yahoo_scraper(config);
-  } else {
+  } else if (scheduler_mins >= 20 && scheduler_mins < 40) {
+    vsin_scraper.vsin_scraper(config);
+  } else if (scheduler_mins >= 40 && scheduler_mins < 60) {
     so_scraper.so_scraper(config);
   }
 });

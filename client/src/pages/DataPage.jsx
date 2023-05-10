@@ -53,11 +53,11 @@ function DataPage() {
   }
 
   useEffect(() => {
-    setTimeout(() => { setIsLoading(false) }, 5000);
+    setTimeout(() => { setIsLoading(false) }, 3000);
   }, []);
 
   useOutsideAlerter(wrapperRef);
-  
+
   // Retrieve game information
   useEffect(() => {
     fetchData({
@@ -71,7 +71,7 @@ function DataPage() {
       }
     })
   }, [fetchData, game]);
-
+  
   const applyFilters = () => {
     let filteredData = unfilterdData.filter((match) => {
       let show_match = false;
@@ -95,7 +95,6 @@ function DataPage() {
     });
     setMatchData(filteredData);
   };
-
 
   return (
     <div className="relative w-full h-fit">
@@ -236,23 +235,6 @@ function DataPage() {
                     <div className={classes.datatable_container}>
                       <Datatable matches={matchData} applyFilters={applyFilters} />
                     </div>
-                    {/* <Col md={3} sm={12}>
-                      <Row>
-                        {verticalAdvertData.map((advert) => (
-                          <Col md={12} className="mt-3" key={advert.ID}>
-                            <a href={advert.Link} target="_blank" rel="noreferrer">
-                              <img
-                                crossOrigin="anonymous"
-                                src={`/images/${advert.IMAGE}`}
-                                width="100%"
-                                height="100%"
-                                alt="Banner Ad"
-                              />
-                            </a>
-                          </Col>
-                        ))}
-                      </Row>
-                    </Col> */}
                   </Row>
                 </Container>
 

@@ -43,4 +43,4 @@ function runScraper(scraper_id) {
 3 - Yahoo Scraper
 */
 
-runScraper(3);
+runScraper(1);

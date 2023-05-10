@@ -2,6 +2,17 @@ import { useCallback, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 
 const useFetch = () => {
+  var retrievalThreshold = 5000; // 5 minute last retrieval time.
+
+  var lastRetrievalDict = {
+    NBA: null,
+    NHL: null,
+    NFL: null,
+    NCAAF: null,
+    NCAAB: null,
+    MLB: null,
+  };
+
   //const { authState } = useContext(AuthContext);
 
   const fetchData = useCallback(

@@ -11,6 +11,7 @@ function vsin_scraper(config) {
   const puppeteer = require('puppeteer');
   const cheerio = require('cheerio');
   const moment = require('moment-timezone');
+  const mssql = require('mssql');
 
   const executeSQL = (sql, callback) => {
     let connection = new Connection(config);
@@ -53,415 +54,473 @@ function vsin_scraper(config) {
     },
   ];
 
+  let pool = new mssql.ConnectionPool(config);
+
+  function getYahooTeamCode(match_name) {
+    const team_code_sql = `SELECT TOP 1 TeamCode FROM BettingSplits WHERE Source = 'YahooSports' AND TeamName = '${match_name}'`;
+    return new Promise(async (resolve, reject) => {
+      try {
+        const request = pool.request();
+        const result = await request.query(team_code_sql);
+        if (result.recordset.length == 0) {
+          throw new Error('No team code found');
+        }
+        resolve(result.recordset[0].TeamCode);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
   // Async function which scrapes the data
   async function scrapeData(url, category) {
-    try {
-      // Fetch HTML of the page we want to scrape
-      const browser = await puppeteer.launch();
-      const page = await browser.newPage();
-      await page.emulateTimezone('America/New_York');
-      await page.goto(url);
-      const html = await page.content();
-      browser.close();
+    return new Promise(async (resolve, reject) => {
+      try {
+        // Stores data for all matches
+        const matches = [];
 
-      // Load HTML we fetched in the previous line
-      const $ = cheerio.load(html);
-      // Select all the list items in plainlist class
-      const listItems = $('.matchups .matchups-tbl-wrpr');
+        await pool.connect();
+        // Fetch HTML of the page we want to scrape
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+        await page.emulateTimezone('America/New_York');
+        await page.goto(url);
+        const html = await page.content();
+        browser.close();
 
-      // Stores data for all matches
-      const matches = [];
-      // Use .each method to loop through the li we selected
-      listItems.each((idx, el) => {
-        // Object holding data for each match
-        const match = {
-          match_id: '',
-          category: category,
-          isLive: false,
-          team1: {
-            code: '',
-            name: '',
-            score: null,
-            spread_data: '',
-            total_data: '',
-            moneyline_data: '',
-          },
-          team2: {
-            code: '',
-            name: '',
-            score: null,
-            spread_data: '',
-            total_data: '',
-            moneyline_data: '',
-          },
-          timing: '',
-        };
-        // Select the text content of a and span elements
-        // Store the textcontent in the above object
-        match.team1.name = $(el)
-          .find(
-            'table:nth-child(1) > thead > tr > th:nth-child(1) > a > span:nth-child(1)'
-          )
-          .text()
-          .trim();
+        // Load HTML we fetched in the previous line
+        const $ = cheerio.load(html);
+        // Select all the list items in plainlist class
+        const listItems = $('.matchups .matchups-tbl-wrpr');
 
-        match.team2.name = $(el)
-          .find(
-            'table:nth-child(1) > thead > tr > th:nth-child(1) > a > span:nth-child(2)'
-          )
-          .text()
-          .trim();
+        // Use .each method to loop through the li we selected
+        listItems.map(async (idx, el) => {
+          // Object holding data for each match
+          const match = {
+            match_id: '',
+            category: category,
+            isLive: false,
+            team1: {
+              code: '',
+              name: '',
+              score: null,
+              spread_data: '',
+              total_data: '',
+              moneyline_data: '',
+            },
+            team2: {
+              code: '',
+              name: '',
+              score: null,
+              spread_data: '',
+              total_data: '',
+              moneyline_data: '',
+            },
+            timing: '',
+          };
+          // Select the text content of a and span elements
+          // Store the textcontent in the above object
+          match.team1.name = $(el)
+            .find(
+              'table:nth-child(1) > thead > tr > th:nth-child(1) > a > span:nth-child(1)'
+            )
+            .text()
+            .trim();
 
-        match.team1.code = $(el)
-          .find(
-            'table:nth-child(1) > tbody > tr:nth-child(1) > td > div > div.team-1 > span.abr'
-          )
-          .text()
-          .trim()
-          .replace(/#\d+ |\d+/g, '');
+          match.team2.name = $(el)
+            .find(
+              'table:nth-child(1) > thead > tr > th:nth-child(1) > a > span:nth-child(2)'
+            )
+            .text()
+            .trim();
 
-        match.team2.code = $(el)
-          .find(
-            'table:nth-child(1) > tbody > tr:nth-child(1) > td > div > div.team-2 > span.abr'
-          )
-          .text()
-          .trim()
-          .replace(/#\d+ |\d+/g, '');
+          match.team1.code = $(el)
+            .find(
+              'table:nth-child(1) > tbody > tr:nth-child(1) > td > div > div.team-1 > span.abr'
+            )
+            .text()
+            .trim()
+            .replace(/#\d+ |\d+/g, '');
 
-        var score = $(el)
-          .find(
-            'table:nth-child(1) > tbody > tr:nth-child(1) > td > div > div.event-info > div.result'
-          )
-          .text()
-          .split('@');
+          await getYahooTeamCode(match.team1.name)
+            .then((code) => {
+              match.team1.code = code;
+            })
+            .catch((err) => {
+              match.team1.code = $(el)
+                .find(
+                  'table:nth-child(1) > tbody > tr:nth-child(1) > td > div > div.team-1 > span.abr'
+                )
+                .text()
+                .trim()
+                .replace(/#\d+ |\d+/g, '');
+            });
 
-        if (score.length === 1) {
-          score = $(el)
+          await getYahooTeamCode(match.team2.name)
+            .then((code) => {
+              match.team2.code = code;
+            })
+            .catch((err) => {
+              match.team2.code = $(el)
+                .find(
+                  'table:nth-child(1) > tbody > tr:nth-child(1) > td > div > div.team-2 > span.abr'
+                )
+                .text()
+                .trim()
+                .replace(/#\d+ |\d+/g, '');
+            });
+
+          var score = $(el)
             .find(
               'table:nth-child(1) > tbody > tr:nth-child(1) > td > div > div.event-info > div.result'
             )
             .text()
-            .split('(N)');
-        }
+            .split('@');
 
-        match.team1.score = score[0] ? score[0] : null;
-        match.team2.score = score[1] ? score[1] : null;
-
-        let match_time = $(el)
-          .find(
-            'table:nth-child(1) > tbody > tr:nth-child(1) > td > div > div.event-info > div.time > span'
-          )
-          .attr('date');
-        let unixTimestamp;
-        if (!match_time) {
-          match.isLive = true;
-          match_time = $(el)
-            .find('table:nth-child(1) > thead > tr > th:nth-child(2) > span')
-            .text();
-
-          const inputMoment = moment(match_time, 'dddd, MMM DD');
-          const vsin_est = inputMoment.format('YYYY-MM-DDTHH:mm:ss');
-          unixTimestamp = inputMoment.unix();
-          match.timing = vsin_est;
-        } else {
-          const inputMoment = moment.utc(match_time);
-          const estMoment = inputMoment.tz('America/New_York');
-          const vsin_est = estMoment.format('YYYY-MM-DDTHH:mm:ss');
-          unixTimestamp = Date.parse(vsin_est) / 1000;
-          match.timing = vsin_est;
-        }
-
-        match.match_id =
-          category +
-          '_' +
-          match.team1.code +
-          '_' +
-          match.team2.code +
-          '_' +
-          unixTimestamp;
-
-        var spread_1 = $(el)
-          .find(
-            '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(2)'
-          )
-          .text()
-          ? $(el)
+          if (score.length === 1) {
+            score = $(el)
               .find(
-                '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(2)'
+                'table:nth-child(1) > tbody > tr:nth-child(1) > td > div > div.event-info > div.result'
               )
               .text()
-              .replace(/[^0-9.-]/g, '')
-          : null;
+              .split('(N)');
+          }
 
-        var spread_bets_1 = $(el)
-          .find(
-            '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(4)'
-          )
-          .text()
-          ? $(el)
-              .find(
-                '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(4)'
-              )
+          match.team1.score = score[0] ? score[0] : null;
+          match.team2.score = score[1] ? score[1] : null;
+
+          let match_time = $(el)
+            .find(
+              'table:nth-child(1) > tbody > tr:nth-child(1) > td > div > div.event-info > div.time > span'
+            )
+            .attr('date');
+          let unixTimestamp;
+          if (!match_time) {
+            match.isLive = true;
+            match_time = $(el)
+              .find('table:nth-child(1) > thead > tr > th:nth-child(2) > span')
               .text()
-              .replace(/[^0-9.-]/g, '')
-          : null;
+              .split(',')[1]
+              .trim();
 
-        var spread_handled_1 = $(el)
-          .find(
-            '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(3)'
-          )
-          .text()
-          ? $(el)
-              .find(
-                '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(3)'
-              )
-              .text()
-              .replace(/[^0-9.-]/g, '')
-          : null;
+            let match_year = $('#CT_Main_1_drpYear').val()
+              ? $('#CT_Main_1_drpYear').val()
+              : new Date().getFullYear();
 
-        var spread_2 = $(el)
-          .find(
-            '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(2)'
-          )
-          .text()
-          ? $(el)
-              .find(
-                '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(2)'
-              )
-              .text()
-              .replace(/[^0-9.-]/g, '')
-          : null;
+            const inputMoment = moment(
+              match_time + ' ' + match_year,
+              'MMM DD yyyy'
+            );
+            const vsin_est = inputMoment.format('YYYY-MM-DDTHH:mm:ss');
+            unixTimestamp = inputMoment.unix();
+            match.timing = vsin_est;
+          } else {
+            const inputMoment = moment.utc(match_time);
+            const estMoment = inputMoment.tz('America/New_York');
+            const vsin_est = estMoment.format('YYYY-MM-DDTHH:mm:ss');
+            unixTimestamp = Date.parse(vsin_est) / 1000;
+            match.timing = vsin_est;
+          }
 
-        var spread_bets_2 = $(el)
-          .find(
-            '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(4)'
-          )
-          .text()
-          ? $(el)
-              .find(
-                '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(4)'
-              )
-              .text()
-              .replace(/[^0-9.-]/g, '')
-          : null;
+          match.match_id =
+            category +
+            '_' +
+            match.team1.code +
+            '_' +
+            match.team2.code +
+            '_' +
+            unixTimestamp;
 
-        var spread_handled_2 = $(el)
-          .find(
-            '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(3)'
-          )
-          .text()
-          ? $(el)
-              .find(
-                '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(3)'
-              )
-              .text()
-              .replace(/[^0-9.-]/g, '')
-          : null;
+          var spread_1 = $(el)
+            .find(
+              '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(2)'
+            )
+            .text()
+            ? $(el)
+                .find(
+                  '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(2)'
+                )
+                .text()
+                .replace(/[^0-9.-]/g, '')
+            : null;
 
-        match.team1.spread_data = JSON.stringify({
-          spread: spread_1,
-          spread_bets: spread_bets_1,
-          spread_handled: spread_handled_1,
+          var spread_bets_1 = $(el)
+            .find(
+              '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(4)'
+            )
+            .text()
+            ? $(el)
+                .find(
+                  '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(4)'
+                )
+                .text()
+                .replace(/[^0-9.-]/g, '')
+            : null;
+
+          var spread_handled_1 = $(el)
+            .find(
+              '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(3)'
+            )
+            .text()
+            ? $(el)
+                .find(
+                  '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(3)'
+                )
+                .text()
+                .replace(/[^0-9.-]/g, '')
+            : null;
+
+          var spread_2 = $(el)
+            .find(
+              '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(2)'
+            )
+            .text()
+            ? $(el)
+                .find(
+                  '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(2)'
+                )
+                .text()
+                .replace(/[^0-9.-]/g, '')
+            : null;
+
+          var spread_bets_2 = $(el)
+            .find(
+              '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(4)'
+            )
+            .text()
+            ? $(el)
+                .find(
+                  '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(4)'
+                )
+                .text()
+                .replace(/[^0-9.-]/g, '')
+            : null;
+
+          var spread_handled_2 = $(el)
+            .find(
+              '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(3)'
+            )
+            .text()
+            ? $(el)
+                .find(
+                  '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(3)'
+                )
+                .text()
+                .replace(/[^0-9.-]/g, '')
+            : null;
+
+          match.team1.spread_data = JSON.stringify({
+            spread: spread_1,
+            spread_bets: spread_bets_1,
+            spread_handled: spread_handled_1,
+          });
+
+          match.team2.spread_data = JSON.stringify({
+            spread: spread_2,
+            spread_bets: spread_bets_2,
+            spread_handled: spread_handled_2,
+          });
+
+          var total_1 = $(el)
+            .find(
+              '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(8)'
+            )
+            .text()
+            ? $(el)
+                .find(
+                  '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(8)'
+                )
+                .text()
+                .replace(/[^0-9.-]/g, '')
+            : null;
+
+          var total_bets_1 = $(el)
+            .find(
+              '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(10)'
+            )
+            .text()
+            ? $(el)
+                .find(
+                  '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(10)'
+                )
+                .text()
+                .replace(/[^0-9.-]/g, '')
+            : null;
+
+          var total_handled_1 = $(el)
+            .find(
+              '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(9)'
+            )
+            .text()
+            ? $(el)
+                .find(
+                  '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(9)'
+                )
+                .text()
+                .replace(/[^0-9.-]/g, '')
+            : null;
+
+          var total_2 = $(el)
+            .find(
+              '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(8)'
+            )
+            .text()
+            ? $(el)
+                .find(
+                  '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(8)'
+                )
+                .text()
+                .replace(/[^0-9.-]/g, '')
+            : null;
+
+          var total_bets_2 = $(el)
+            .find(
+              '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(10)'
+            )
+            .text()
+            ? $(el)
+                .find(
+                  '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(10)'
+                )
+                .text()
+                .replace(/[^0-9.-]/g, '')
+            : null;
+
+          var total_handled_2 = $(el)
+            .find(
+              '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(9)'
+            )
+            .text()
+            ? $(el)
+                .find(
+                  '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(9)'
+                )
+                .text()
+                .replace(/[^0-9.-]/g, '')
+            : null;
+
+          match.team1.total_data = JSON.stringify({
+            total: total_1,
+            total_bets: total_bets_1,
+            total_handled: total_handled_1,
+          });
+
+          match.team2.total_data = JSON.stringify({
+            total: total_2,
+            total_bets: total_bets_2,
+            total_handled: total_handled_2,
+          });
+
+          var moneyline_1 = $(el)
+            .find(
+              '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(5)'
+            )
+            .text()
+            ? $(el)
+                .find(
+                  '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(5)'
+                )
+                .text()
+                .replace(/[^0-9.-]/g, '')
+            : null;
+
+          var moneyline_bets_1 = $(el)
+            .find(
+              '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(7)'
+            )
+            .text()
+            ? $(el)
+                .find(
+                  '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(7)'
+                )
+                .text()
+                .replace(/[^0-9.-]/g, '')
+            : null;
+
+          var moneyline_handled_1 = $(el)
+            .find(
+              '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(6)'
+            )
+            .text()
+            ? $(el)
+                .find(
+                  '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(6)'
+                )
+                .text()
+                .replace(/[^0-9.-]/g, '')
+            : null;
+
+          var moneyline_2 = $(el)
+            .find(
+              '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(5)'
+            )
+            .text()
+            ? $(el)
+                .find(
+                  '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(5)'
+                )
+                .text()
+                .replace(/[^0-9.-]/g, '')
+            : null;
+
+          var moneyline_bets_2 = $(el)
+            .find(
+              '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(7)'
+            )
+            .text()
+            ? $(el)
+                .find(
+                  '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(7)'
+                )
+                .text()
+                .replace(/[^0-9.-]/g, '')
+            : null;
+
+          var moneyline_handled_2 = $(el)
+            .find(
+              '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(6)'
+            )
+            .text()
+            ? $(el)
+                .find(
+                  '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(6)'
+                )
+                .text()
+                .replace(/[^0-9.-]/g, '')
+            : null;
+
+          match.team1.moneyline_data = JSON.stringify({
+            moneyline: moneyline_1,
+            moneyline_bets: moneyline_bets_1,
+            moneyline_handled: moneyline_handled_1,
+          });
+
+          match.team2.moneyline_data = JSON.stringify({
+            moneyline: moneyline_2,
+            moneyline_bets: moneyline_bets_2,
+            moneyline_handled: moneyline_handled_2,
+          });
+
+          matches[match.match_id] = match;
+          await pool.close();
+
+          if (idx == listItems.length - 1) {
+            //return matches;
+            resolve(matches);
+          }
         });
-
-        match.team2.spread_data = JSON.stringify({
-          spread: spread_2,
-          spread_bets: spread_bets_2,
-          spread_handled: spread_handled_2,
-        });
-
-        var total_1 = $(el)
-          .find(
-            '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(8)'
-          )
-          .text()
-          ? $(el)
-              .find(
-                '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(8)'
-              )
-              .text()
-              .replace(/[^0-9.-]/g, '')
-          : null;
-
-        var total_bets_1 = $(el)
-          .find(
-            '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(10)'
-          )
-          .text()
-          ? $(el)
-              .find(
-                '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(10)'
-              )
-              .text()
-              .replace(/[^0-9.-]/g, '')
-          : null;
-
-        var total_handled_1 = $(el)
-          .find(
-            '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(9)'
-          )
-          .text()
-          ? $(el)
-              .find(
-                '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(9)'
-              )
-              .text()
-              .replace(/[^0-9.-]/g, '')
-          : null;
-
-        var total_2 = $(el)
-          .find(
-            '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(8)'
-          )
-          .text()
-          ? $(el)
-              .find(
-                '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(8)'
-              )
-              .text()
-              .replace(/[^0-9.-]/g, '')
-          : null;
-
-        var total_bets_2 = $(el)
-          .find(
-            '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(10)'
-          )
-          .text()
-          ? $(el)
-              .find(
-                '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(10)'
-              )
-              .text()
-              .replace(/[^0-9.-]/g, '')
-          : null;
-
-        var total_handled_2 = $(el)
-          .find(
-            '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(9)'
-          )
-          .text()
-          ? $(el)
-              .find(
-                '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(9)'
-              )
-              .text()
-              .replace(/[^0-9.-]/g, '')
-          : null;
-
-        match.team1.total_data = JSON.stringify({
-          total: total_1,
-          total_bets: total_bets_1,
-          total_handled: total_handled_1,
-        });
-
-        match.team2.total_data = JSON.stringify({
-          total: total_2,
-          total_bets: total_bets_2,
-          total_handled: total_handled_2,
-        });
-
-        var moneyline_1 = $(el)
-          .find(
-            '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(5)'
-          )
-          .text()
-          ? $(el)
-              .find(
-                '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(5)'
-              )
-              .text()
-              .replace(/[^0-9.-]/g, '')
-          : null;
-
-        var moneyline_bets_1 = $(el)
-          .find(
-            '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(7)'
-          )
-          .text()
-          ? $(el)
-              .find(
-                '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(7)'
-              )
-              .text()
-              .replace(/[^0-9.-]/g, '')
-          : null;
-
-        var moneyline_handled_1 = $(el)
-          .find(
-            '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(6)'
-          )
-          .text()
-          ? $(el)
-              .find(
-                '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(1) > td:nth-child(6)'
-              )
-              .text()
-              .replace(/[^0-9.-]/g, '')
-          : null;
-
-        var moneyline_2 = $(el)
-          .find(
-            '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(5)'
-          )
-          .text()
-          ? $(el)
-              .find(
-                '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(5)'
-              )
-              .text()
-              .replace(/[^0-9.-]/g, '')
-          : null;
-
-        var moneyline_bets_2 = $(el)
-          .find(
-            '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(7)'
-          )
-          .text()
-          ? $(el)
-              .find(
-                '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(7)'
-              )
-              .text()
-              .replace(/[^0-9.-]/g, '')
-          : null;
-
-        var moneyline_handled_2 = $(el)
-          .find(
-            '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(6)'
-          )
-          .text()
-          ? $(el)
-              .find(
-                '.resp-tbl-4-wrpr > table > tbody > tr:nth-child(2) > td:nth-child(6)'
-              )
-              .text()
-              .replace(/[^0-9.-]/g, '')
-          : null;
-
-        match.team1.moneyline_data = JSON.stringify({
-          moneyline: moneyline_1,
-          moneyline_bets: moneyline_bets_1,
-          moneyline_handled: moneyline_handled_1,
-        });
-
-        match.team2.moneyline_data = JSON.stringify({
-          moneyline: moneyline_2,
-          moneyline_bets: moneyline_bets_2,
-          moneyline_handled: moneyline_handled_2,
-        });
-
-        matches[match.match_id] = match;
-      });
-      // Logs match array to the console
-      console.dir(matches);
-
-      return matches;
-    } catch (err) {
-      console.error(err);
-    }
+      } catch (err) {
+        console.error(err);
+        reject(error);
+      }
+    });
   }
 
   function insertDatabase(game, match, match_data, against_code) {
+    const current_time = moment()
+      .tz('America/New_York')
+      .format('YYYY-MM-DDTHH:mm:ss');
+
     let spread_data = match_data.spread_data
       ? JSON.parse(match_data.spread_data)
       : {};
@@ -472,7 +531,7 @@ function vsin_scraper(config) {
       ? JSON.parse(match_data.moneyline_data)
       : {};
 
-    const sql = `INSERT INTO dbo.BettingSplits(MatchId, Sport, TeamCode, TeamName, AgainstCode, GameTime, Spread, SpreadBets, SpreadHandled, Total, TotalBets, TotalHandled, Moneyline, MoneylineBets, MoneylineHandled, Score, Source) VALUES (
+    const sql = `INSERT INTO dbo.BettingSplits(MatchId, Sport, TeamCode, TeamName, AgainstCode, GameTime, Spread, SpreadBets, SpreadHandled, Total, TotalBets, TotalHandled, Moneyline, MoneylineBets, MoneylineHandled, Score, Source, CreatedAt) VALUES (
       '${match.match_id}',
       '${game.name}',
       '${match_data.code}',
@@ -489,7 +548,8 @@ function vsin_scraper(config) {
       '${moneyline_data.moneyline_bets || 0}',
       '${moneyline_data.moneyline_handled || 0}',
       ${match_data.score || 0},
-      'VSiN')`;
+      'VSiN',
+      '${current_time}')`;
 
     executeSQL(sql, (err, data) => {
       if (err) {
@@ -502,6 +562,10 @@ function vsin_scraper(config) {
   }
 
   function updateDatabase(game, match, match_data) {
+    const current_time = moment()
+      .tz('America/New_York')
+      .format('YYYY-MM-DDTHH:mm:ss');
+
     let spread_data = match_data.spread_data
       ? JSON.parse(match_data.spread_data)
       : {};
@@ -522,9 +586,12 @@ function vsin_scraper(config) {
       Moneyline = '${moneyline_data.moneyline || 0}',
       MoneylineBets = '${moneyline_data.moneyline_bets || 0}',
       MoneylineHandled = '${moneyline_data.moneyline_handled || 0}',
+      UpdatedAt = '${current_time}',
       Score = ${match_data.score || 0} WHERE MatchId='${
       match.match_id
-    }' AND TeamCode ='${match_data.code}' AND Source = 'VSiN'`;
+    }' AND Sport='${game.name}' AND TeamCode ='${
+      match_data.code
+    }' AND Source = 'VSiN'`;
 
     executeSQL(sql, (err, data) => {
       if (err) {
@@ -537,6 +604,10 @@ function vsin_scraper(config) {
   }
 
   function updateLiveDatabase(game, match, match_data, against_code) {
+    const current_time = moment()
+      .tz('America/New_York')
+      .format('YYYY-MM-DDTHH:mm:ss');
+
     let spread_data = match_data.spread_data
       ? JSON.parse(match_data.spread_data)
       : {};
@@ -546,10 +617,8 @@ function vsin_scraper(config) {
     let moneyline_data = match_data.moneyline_data
       ? JSON.parse(match_data.moneyline_data)
       : {};
-
     let matchDate = match.timing.split('T')[0];
-
-    const sql = `UPDATE dbo.BettingSplits SET 
+    const sql = `UPDATE dbo.BettingSplits SET
       Spread = '${spread_data.spread || 0}',
       SpreadBets = '${spread_data.spread_bets || 0}',
       SpreadHandled = '${spread_data.spread_handled || 0}',
@@ -559,32 +628,35 @@ function vsin_scraper(config) {
       Moneyline = '${moneyline_data.moneyline || 0}',
       MoneylineBets = '${moneyline_data.moneyline_bets || 0}',
       MoneylineHandled = '${moneyline_data.moneyline_handled || 0}',
+      UpdatedAt = '${current_time}',
       Score = ${
         match_data.score || 0
       } WHERE CAST(Gametime AS DATE) = '${matchDate}' AND TeamCode ='${
       match_data.code
-    }' AND Source = 'VSiN'`;
-
+    }' AND Sport='${game.name}' AND Source = 'VSiN'`;
     executeSQL(sql, (err, data) => {
       if (err) {
         console.log(sql);
         console.error(err);
         return;
       }
-      console.log('Updated to the database (Live) - ' + match.match_id, data);
+      console.log(
+        'Updated to the database (Live) - ' + match.match_id,
+        matchDate,
+        data
+      );
     });
   }
 
   function fetchData() {
     const all_matches = [];
-    var itemsProcessed = 0;
     GamesData.forEach(async (game, index, array) => {
       const matches_returned = await scrapeData(game.url, game.name);
+      console.log('Matches returned for ' + game.name, matches_returned);
       for (const [match_id, match] of Object.entries(matches_returned)) {
         all_matches.push({ ...match, game: game });
       }
-      itemsProcessed++;
-      if (itemsProcessed === array.length) {
+      if (index === array.length - 1) {
         processData(
           all_matches,
           0,
@@ -603,7 +675,7 @@ function vsin_scraper(config) {
         if (match.isLive) {
           updateLiveDatabase(game, match, match.team1, match.team2.code);
         } else {
-          const sql_1 = `SELECT * FROM BettingSplits WHERE MatchId = '${match.match_id}' AND TeamCode = '${match.team1.code}' AND Source = 'VSiN'`;
+          const sql_1 = `SELECT * FROM BettingSplits WHERE MatchId = '${match.match_id}' AND TeamCode = '${match.team1.code}' AND Sport='${game.name}' AND Source = 'VSiN'`;
           executeSQL(sql_1, (err, { rowCount, rows }) => {
             if (err) console.error(err);
             if (rowCount) {
@@ -619,7 +691,7 @@ function vsin_scraper(config) {
         if (match.isLive) {
           updateLiveDatabase(game, match, match.team2, match.team1.code);
         } else {
-          const sql_2 = `SELECT * FROM BettingSplits WHERE MatchId = '${match.match_id}' AND TeamCode = '${match.team2.code}' AND Source = 'VSiN'`;
+          const sql_2 = `SELECT * FROM BettingSplits WHERE MatchId = '${match.match_id}' AND TeamCode = '${match.team2.code}' AND Sport='${game.name}' AND Source = 'VSiN'`;
           executeSQL(sql_2, (err, { rowCount, rows }) => {
             if (err) console.error(err);
             if (rowCount) {
