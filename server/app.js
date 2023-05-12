@@ -6,10 +6,8 @@ const path = require('path');
 const helmet = require('helmet');
 const multer = require('multer');
 const app = express();
-const emailvalidator = require('email-validator');
 const service = require('./service.js');
 const util = require('./util.js');
-const sendEmail = require('./email.js');
 
 const cron = require('node-cron');
 const so_scraper = require('../scrapers/so_scraper');
@@ -65,20 +63,6 @@ app.get('/api/getAggregatedData', (req, res) => {
       res.status(500).send(util.getResponse(err, false));
     }
   ).catch((err) => res.status(403).send(util.getResponse(err, false)));
-
-  // util
-  //   //.verifyToken(req, res, false)
-  //   .then((response) => {
-  //     service.getAggregatedData(sport).then(
-  //       (data) => {
-  //         res.status(200).send(util.getResponse(data, true));
-  //       },
-  //       (err) => {
-  //         res.status(500).send(util.getResponse(err, false));
-  //       }
-  //     );
-  //   })
-  //   .catch((err) => res.status(403).send(util.getResponse(err, false)));
 });
 
 // All other GET requests not handled before will return our React app

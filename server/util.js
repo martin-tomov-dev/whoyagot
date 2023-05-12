@@ -126,37 +126,6 @@ module.exports = {
     return response;
   },
 
-  verifyToken: (req, res, isRestricted) => {
-    return new Promise((resolve, reject) => {
-      const token = req.body.token || req.query.token || req.headers['token'];
-      if (!token) {
-        return reject('A token is required for authentication');
-      }
-      try {
-        const decoded = jwt.verify(token, process.env.JWT_TOKEN_KEY);
-        if (isRestricted) {
-          if (decoded.role == 'admin') resolve(true);
-          else reject('Invalid Token');
-        } else {
-          resolve(true);
-        }
-      } catch (err) {
-        return reject('Invalid Token');
-      }
-      return resolve(true);
-    });
-  },
-
-  getToken: (username, password, role) => {
-    return jwt.sign(
-      { username: username, password: password, role: role },
-      process.env.JWT_TOKEN_KEY,
-      {
-        expiresIn: '2h',
-      }
-    );
-  },
-
   formatDate: (date) => {
     var d = new Date(date),
       month = '' + (d.getMonth() + 1),

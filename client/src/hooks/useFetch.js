@@ -1,20 +1,6 @@
 import { useCallback, useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
 
 const useFetch = () => {
-  var retrievalThreshold = 5000; // 5 minute last retrieval time.
-
-  var lastRetrievalDict = {
-    NBA: null,
-    NHL: null,
-    NFL: null,
-    NCAAF: null,
-    NCAAB: null,
-    MLB: null,
-  };
-
-  //const { authState } = useContext(AuthContext);
-
   const fetchData = useCallback(
     async (props) => {
       let requestOptions;
@@ -25,10 +11,6 @@ const useFetch = () => {
           method: props.method,
           headers: { 'Content-Type': 'application/json' },
         };
-
-        // if (authState.token) {
-        //   requestOptions.headers.token = authState.token;
-        // }
 
         if (props.method === 'POST') {
           requestOptions.body = JSON.stringify(props.body);
@@ -42,8 +24,7 @@ const useFetch = () => {
         .catch((error) => {
           console.log(error);
         });
-    }//,
-    //[authState]
+    }
   );
 
   return { fetchData };
