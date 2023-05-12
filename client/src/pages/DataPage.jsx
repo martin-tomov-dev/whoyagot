@@ -61,7 +61,7 @@ function DataPage() {
   // Retrieve game information
   useEffect(() => {
     fetchData({
-      url: '/api/getAggregatedData?sport=' + game,
+      url: 'http://localhost:3001/api/getAggregatedData?sport=' + game,
       method: 'GET',
     })
     .then((result) => {
@@ -124,9 +124,9 @@ function DataPage() {
               <span class="loader top-80"></span>
             </div>
             :
-            <div className="sm:flex py-8">
-              <div className="sm:w-1/6 h-fit sm:mx-6 h-[600px] py-6 bg-[#111] p-4 text-sm text-[#888] mt-8">
-                <h1 className="text-center text-lg font-[500]">News</h1>
+            <div className="sm:flex sm:py-8 py-4">
+              <div className="sm:w-1/6 h-fit sm:mx-6 mx-2 my-2 h-[600px] bg-[#111] p-4 text-sm text-[#888] mt-2 sm:mt-8">
+                <h1 className="text-center text-lg font-[500] mt-2">News</h1>
                 Profitable sports bettors look for good value opportunities in wagers and use a variety of data to make their decisions.
                 WYG provides some of the data critical to this decision process.   WYG provides consensus data in a clean table to filter and download for future analysis while other sites present this data in a confusing format.
                 Again, use this data as you deem appropriate with your other analysis.
@@ -276,41 +276,41 @@ function DataPage() {
               </div>
               <div className="sm:w-1/3 sm:mx-6 sm:block grid sm:grid-cols-1 grid-cols-2 text-[#aaa] mt-8">
                 <div className="m-2 flex">
-                  <div className='mx-2 h-fit rounded-lg min-w-56 w-full cursor-pointer sm:flex justify-end' >
-                    <img src='imgs/banner (5).png' className='w-60 aspect-ratio rounded mx-auto' />
-                    <p className="p-4 text-xs sm:text-sm">
+                  <div className='mx-2 h-fit rounded-lg min-w-56 w-full cursor-pointer md:flex' >
+                    <img src='imgs/banner (5).png' className='md:w-1/2 aspect-square rounded mx-auto' />
+                    <p className="p-2 md:p-4 text-xs sm:text-sm md:w-1/2">
                       You are minutes away from participating in the action.  Open an account within 15 minutes with the sportsbooks above to place your smart, logic-based, informed wagers.
                     </p>
                   </div>
                 </div>
                 <div className="m-2 flex">
-                  <div className='mx-2 h-fit rounded-lg min-w-56 w-full cursor-pointer sm:flex justify-end' >
-                    <img src='imgs/banner (6).png' className='w-60 aspect-ratio rounded mx-auto' />
-                    <p className="p-4 text-xs sm:text-sm">
+                  <div className='mx-2 h-fit rounded-lg min-w-56 w-full cursor-pointer md:flex' >
+                    <img src='imgs/banner (6).png' className='md:w-1/2 aspect-square rounded mx-auto' />
+                    <p className="p-2 md:p-4 text-xs sm:text-sm md:w-1/2">
                       You are minutes away from participating in the action.  Open an account within 15 minutes with the sportsbooks above to place your smart, logic-based, informed wagers.
                     </p>
                   </div>
                 </div>
                 <div className="m-2 flex">
-                  <div className='mx-2 h-fit rounded-lg min-w-56 w-full cursor-pointer sm:flex justify-end' >
-                    <img src='imgs/banner (7).png' className='w-60 aspect-ratio rounded mx-auto' />
-                    <p className="p-4 text-xs sm:text-sm">
+                  <div className='mx-2 h-fit rounded-lg min-w-56 w-full cursor-pointer md:flex' >
+                    <img src='imgs/banner (7).png' className='md:w-1/2 aspect-square rounded mx-auto' />
+                    <p className="p-2 md:p-4 text-xs sm:text-sm md:w-1/2">
                       You are minutes away from participating in the action.  Open an account within 15 minutes with the sportsbooks above to place your smart, logic-based, informed wagers.
                     </p>
                   </div>
                 </div>
                 <div className="m-2 flex">
-                  <div className='mx-2 h-fit rounded-lg min-w-56 w-full cursor-pointer sm:flex justify-end' >
-                    <img src='imgs/banner (2).png' className='w-60 aspect-ratio rounded mx-auto' />
-                    <p className="p-4 text-xs sm:text-sm">
+                  <div className='mx-2 h-fit rounded-lg min-w-56 w-full cursor-pointer md:flex' >
+                    <img src='imgs/banner (2).png' className='md:w-1/2 aspect-square rounded mx-auto' />
+                    <p className="p-2 md:p-4 text-xs sm:text-sm md:w-1/2">
                       You are minutes away from participating in the action.  Open an account within 15 minutes with the sportsbooks above to place your smart, logic-based, informed wagers.
                     </p>
                   </div>
                 </div>
                 <div className="m-2 flex">
-                  <div className='mx-2 h-fit rounded-lg min-w-56 w-full cursor-pointer sm:flex justify-end' >
-                    <img src='imgs/banner (3).png' className='w-60 aspect-ratio rounded mx-auto' />
-                    <p className="p-4 text-xs sm:text-sm">
+                  <div className='mx-2 h-fit rounded-lg min-w-56 w-full cursor-pointer md:flex' >
+                    <img src='imgs/banner (3).png' className='md:w-1/2 aspect-square rounded mx-auto' />
+                    <p className="p-2 md:p-4 text-xs sm:text-sm md:w-1/2">
                       You are minutes away from participating in the action.  Open an account within 15 minutes with the sportsbooks above to place your smart, logic-based, informed wagers.
                     </p>
                   </div>
