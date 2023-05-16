@@ -95,7 +95,7 @@ module.exports = {
         jsonArr.push(value);
         teamWiseObject[value.TeamCode] = jsonArr;
       });
-      console.log('team wise object ', teamWiseObject);
+      // console.log('team wise object ', teamWiseObject);
       jsonObject[matchId] = combineTeamObject(teamWiseObject);
       response.push(jsonObject);
     }

@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
+import useFetch from '../hooks/useFetch';
 
 function Main() {
   const main = useRef(null);
   const [showModal, setShowModal] = useState(false);
   const [modalHeight, setModalHeight] = useState('100vh');
   const navigate = useNavigate();
+  const { fetchData } = useFetch();
 
   const [passCode, setPasscode] = useState('');
   const [isCheckedAgeConfirm, setIsCheckedAgeConfirm] = useState(false);
@@ -32,9 +34,20 @@ function Main() {
     } else if (formValidation('email', subscribeInfo.email) === false) {
       toast.warn('Email type is invalid');
     } else {
-      setShowModal(false);
-      toast.success('Subscribed successfully! Please check your email.');
-      console.log(subscribeInfo);
+      fetchData({
+        url: 'http://localhost:3001/api/subscribe',
+        body: { ...subscribeInfo },
+        method: 'POST',
+      })
+        .then((result) => {
+          if (result.message === 'success') {
+            setShowModal(false);
+            toast.success('Subscribed successfully! Please check your email.');
+          } else {
+            toast.error(result.message);
+          }
+        })
+        .catch((err) => toast.error(err.message))
     }
   };
 
@@ -45,13 +58,19 @@ function Main() {
     } else if (!isCheckedAgeConfirm) {
       toast.warn('You should confirm that you are over 18 years old');
     } else {
-      //   window.confirm(`hi, i'm vlady. can we chat in skype or telegram? 
-      //     tg- https://t.me/sgguru1030
-      //     skype- live:.cid.2bd07c5f71b031ec
-      // if you looked this, please message me "Okay, good" in freelancer or telegram/skype chat
-      //   `);
-      toast.success('Passed successfully!');
-      navigate('/data');
+      fetchData({
+        url: 'http://localhost:3001/api/passcodeLogin?passcode=' + passCode,
+        method: 'GET',
+      })
+        .then((result) => {
+          if (result.data?.passcodeValid == true) {
+            toast.success('Passed successfully!');
+            navigate('/data');
+          } else {
+            toast.error('Wrong Passcode!');
+          }
+        })
+        .catch((err) => toast.error(err.message))
     }
   };
 

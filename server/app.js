@@ -1,14 +1,20 @@
 require('dotenv').config();
+require('./db/index');
 const express = require('express');
 const bodyParser = require('body-parser');
+const flash = require('express-flash');
+const session = require('express-session');
 const cors = require('cors');
 const path = require('path');
 const helmet = require('helmet');
 const multer = require('multer');
 const app = express();
+
 const service = require('./service.js');
 const util = require('./util.js');
-
+const usersRouter = require('./routes/users');
+const passcodeRouter = require('./routes/passcode');
+// var dataRouter = require('./routes/data');
 const cron = require('node-cron');
 const so_scraper = require('../scrapers/so_scraper');
 const vsin_scraper = require('../scrapers/vsin_scraper');
@@ -18,7 +24,19 @@ app.use(express.static('assets'));
 app.use('/images', express.static('images'));
 
 // Have Node serve the files for our built React app
-app.use(express.static(path.resolve(__dirname, '../client/build')));
+// app.use(express.static(path.resolve(__dirname, '../client/build')));
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+app.use(session({
+  cookie: { maxAge: 60000 },
+  store: new session.MemoryStore,
+  saveUninitialized: true,
+  resave: 'true',
+  secret: 'secret'
+}))
+
+app.use(flash());
 
 app.use(
   helmet.contentSecurityPolicy({
@@ -38,6 +56,14 @@ app.use(
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
+
+app.use('/', usersRouter);
+
+app.use('/users', usersRouter);
+app.use('/passcode', passcodeRouter);
+// app.use('/data', dataRouter);
+// app.use('/howtouse', dataRouter);
+
 
 const PORT = process.env.PORT || 3001;
 const DIR = './assets/images/';
@@ -61,6 +87,29 @@ app.get('/api/getAggregatedData', (req, res) => {
     },
     (err) => {
       res.status(500).send(util.getResponse(err, false));
+    }
+  ).catch((err) => res.status(403).send(util.getResponse(err, false)));
+});
+
+app.post('/api/subscribe', (req, res) => {
+  service.subscribe(req.body).then(
+    (data) => {
+      res.status(200).send({ message: 'success' });
+    },
+    (err) => {
+      res.status(500).send({ message: 'Duplicated Userinfo!' });
+    }
+  ).catch((err) => res.status(403).send(util.getResponse(err, false)));
+});
+
+app.get('/api/passcodeLogin', (req, res) => {
+  let passcode = req.query.passcode;
+  service.passcodeLogin(passcode).then(
+    (data) => {
+      res.status(200).send({ data });
+    },
+    (err) => {
+      res.status(500).send({ message: 'Wrong Passcode!' });
     }
   ).catch((err) => res.status(403).send(util.getResponse(err, false)));
 });

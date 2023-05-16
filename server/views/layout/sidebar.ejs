@@ -1,0 +1,111 @@
+<style>
+    .nav-link:hover {
+        transition: all 0.4s;
+    }
+
+    .nav-link-collapse:after {
+        float: right;
+        content: '\f067';
+        font-family: 'FontAwesome';
+    }
+
+    .nav-link-show:after {
+        float: right;
+        content: '\f068';
+        font-family: 'FontAwesome';
+    }
+
+    .nav-item {
+        padding: 2px 8px;
+    }
+
+    .nav-item.clicked {
+        background: #454552;
+    }
+
+    .nav-item ul.nav-second-level {
+        padding-left: 0;
+    }
+
+    .nav-item ul.nav-second-level>.nav-item {
+        padding-left: 20px;
+    }
+
+    .content {
+        margin-left: 0px;
+    }
+
+    .card-body {
+        overflow-x: auto;
+    }
+
+    @media (min-width: 992px) {
+        .sidenav {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 230px;
+            height: calc(100vh - 3.5rem);
+            margin-top: 3.5rem;
+            background: #343a40;
+            box-sizing: border-box;
+            border-top: 1px solid rgba(0, 0, 0, 0.3);
+        }
+
+        .navbar-expand-lg .sidenav {
+            flex-direction: column;
+        }
+
+        .content {
+            margin-left: 230px;
+            margin-top: 66px;
+        }
+
+        .content-wrapper {
+            margin-left: 230px;
+        }
+
+    }
+</style>
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="#">WhoYaGot??</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+        aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto sidenav" id="navAccordion">
+            <li class="nav-item">
+                <a class="nav-link" href="/users">Users</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/passcode">Passcode</a>
+            </li>
+            <!-- <li class="nav-item">
+                <a class="nav-link" href="/data">Data Page</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/howtouse">How To Use</a>
+            </li> -->
+        </ul>
+    </div>
+</nav>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"
+    integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+<script>
+    $(document).ready(function () {
+        $('.navbar-toggler').on('click', function () {
+            $(this).toggleClass('collapsed');
+            $('#navbarCollapse').toggleClass('show');
+        });
+
+        $('.nav-item').on('click', function () {
+            $('.nav-item').map((val, element) => {
+                element.classList.remove('clicked');
+            });
+            $(this).addClass('clicked');
+        });
+    });
+</script>

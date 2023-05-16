@@ -1,61 +1,20 @@
 const Request = require('tedious').Request;
 const { getToken } = require('./util');
 const util = require('./util');
-var Connection = require('tedious').Connection;
-
-var dbConfig = {
-  server: process.env.DATABASE_SERVER,
-  authentication: {
-    type: 'default',
-    options: {
-      userName: process.env.DATABASE_USERNAME,
-      password: process.env.DATABASE_PASSWORD,
-    },
-  },
-  options: {
-    database: process.env.DATABASE_NAME,
-    encrypt: true,
-  },
-};
-var connection = new Connection(dbConfig);
-connectionActive = false;
-
-function connect() {
-  return new Promise(function (resolve, reject) {
-    if (connectionActive) {
-      resolve(connection);
-      return;
-    }
-    connection.connect(
-      () => {
-        connectionActive = true;
-        resolve(connection);
-        return;
-      },
-      (err) => {
-        reject(err);
-      }
-    );
-  });
-}
-
-connection.on('error', (err) => {
-  console.log('error in connection ' + err);
-  connectionActive = false;
-});
+const connect = require('./db/index');
 
 module.exports = {
   getAggregatedData: (sport) => {
     let date = new Date();
-    date.setDate(date.getDate() - 1);
+    date.setDate(date.getDate() - 3);
     date = util.formatDate(date);
     let errorMessage = '';
     let request = new Request(
       "SELECT * FROM BettingSplits where GameTime >= '" +
-        date +
-        "' AND Sport='" +
-        sport +
-        "' ORDER BY GameTime DESC",
+      date +
+      "' AND Sport='" +
+      sport +
+      "' ORDER BY GameTime DESC",
       (err) => {
         if (err) {
           errorMessage = err.message;
@@ -93,4 +52,66 @@ module.exports = {
         .catch((err) => reject(err));
     });
   },
+
+  subscribe: ({ name, email, state, user_type = 'Customer' }) => {
+    let errorMessage = '';
+    let request = new Request(
+      "INSERT INTO Users(Name, Email, State, UserType) VALUES('" + name + "','" + email + "', '" + state + "', '" + user_type + "')",
+      (err) => {
+        if (err) {
+          errorMessage = err.message;
+        }
+      }
+    );
+
+    return new Promise((resolve, reject) => {
+      request.on('error', (error) => {
+        reject(error.message);
+      });
+      request.on('requestCompleted', () => {
+        errorMessage == '' ? resolve('Success') : reject(errorMessage);
+        return;
+      });
+
+      connect()
+        .then((conn) => conn.execSql(request))
+        .catch((err) => reject(err));
+    });
+  },
+  passcodeLogin: (passcode) => {
+    let errorMessage = '';
+    let request = new Request(
+      "SELECT Count(1) FROM Passcode where Passcode = '" +
+        passcode +
+        "' and IsActive = 'True'",
+      (err) => {
+        if (err) {
+          errorMessage = err.message;
+        }
+      }
+    );
+
+    return new Promise((resolve, reject) => {
+      data = {};
+      request.on('row', function (columns) {
+        count = columns[0].value;
+        if (count > 0) {
+          // data['authtoken'] = getToken('user', passcode, 'user');
+          data['passcodeValid'] = true;
+        } else {
+          data['passcodeValid'] = false;
+        }
+      });
+      request.on('error', (error) => reject(error.message));
+      request.on('requestCompleted', () =>{
+        errorMessage == '' ? resolve(data) : reject(errorMessage)
+      }
+      );
+
+      connect()
+        .then((conn) => conn.execSql(request))
+        .catch((err) => reject(err));
+    });
+  },
+
 };
