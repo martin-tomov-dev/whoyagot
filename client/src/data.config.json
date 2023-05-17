@@ -1,8 +1,19 @@
 {
     "DataPage": {
         "middleBanners": [
-            "imgs/banner (1).png",
-            "imgs/banner (3).png"
+            "/imgs/middle-banner (1).jpg",
+            "/imgs/middle-banner (2).jpg"
+        ],
+        "rightBanners": [
+            {
+                "src":"/imgs/right-banner (1).jpg",
+                "text":"Tired of the 9-5? Be your own boss by starting your own company today. Incfile makes starting your company easy. Find out more here."
+            },
+            {
+                "src": "/imgs/right-banner (2).jpg",
+                "text":"Sleep, Relax, Focus.   Green Roads offers boh THC and CBD product.   Use Code 'WYG15' for 15% off your first order."
+            }
+           
         ],
         "text": "sample text",
         "link": "https://example.com"

@@ -27,7 +27,7 @@ function DataPage() {
 
   const main = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const configData = config.DataPage;
   const navigate = useNavigate();
@@ -140,15 +140,15 @@ function DataPage() {
                 <div className="grid sm:grid-cols-2 gap-4 mt-4">
                   <div className='bg-[#F0F2F4] mr-2 h-fit  my-2 rounded-lg min-w-56 w-full cursor-pointer relative'>
                     <img src={configData?.middleBanners[0]} className='w-full aspect-ratio rounded' />
-                    <div className="w-full absolute bottom-0 backdrop-blur-[3px] h-20 bg-black/30 text-white flex items-center justify-center">
+                    {/* <div className="w-full absolute bottom-0 backdrop-blur-[3px] h-20 bg-black/30 text-white flex items-center justify-center">
                       <button className="bg-[#d9036a] py-2 px-6 font-bold w-full mx-2 rounded mt-4">Go to Website</button>
-                    </div>
+                    </div> */}
                   </div>
                   <div className='bg-[#F0F2F4] mr-2 h-fit  my-2 rounded-lg min-w-56 w-full cursor-pointer relative'>
                     <img src={configData?.middleBanners[1]} className='w-full aspect-ratio rounded' />
-                    <div className="w-full absolute bottom-0 backdrop-blur-[3px] h-20 bg-black/30 text-white flex items-center justify-center">
+                    {/* <div className="w-full absolute bottom-0 backdrop-blur-[3px] h-20 bg-black/30 text-white flex items-center justify-center">
                       <button className="bg-[#46afaa] py-2 px-6 font-bold w-full mx-2 rounded mt-4">Go to Website</button>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 
@@ -277,41 +277,17 @@ function DataPage() {
               <div className="sm:w-1/3 sm:mx-6 sm:block grid sm:grid-cols-1 grid-cols-2 text-[#aaa] mt-8">
                 <div className="m-2 flex">
                   <div className='mx-2 h-fit rounded-lg min-w-56 w-full cursor-pointer md:flex' >
-                    <img src='imgs/banner (5).png' className='md:w-1/2 aspect-square rounded mx-auto' />
+                    <img src={configData?.rightBanners[0].src} className='md:w-1/2 aspect-square rounded mx-auto' />
                     <p className="p-2 md:p-4 text-xs sm:text-sm md:w-1/2">
-                      You are minutes away from participating in the action.  Open an account within 15 minutes with the sportsbooks above to place your smart, logic-based, informed wagers.
+                    {configData?.rightBanners[0].text}
                     </p>
                   </div>
                 </div>
                 <div className="m-2 flex">
                   <div className='mx-2 h-fit rounded-lg min-w-56 w-full cursor-pointer md:flex' >
-                    <img src='imgs/banner (6).png' className='md:w-1/2 aspect-square rounded mx-auto' />
+                    <img src={configData?.rightBanners[1].src} className='md:w-1/2 aspect-square rounded mx-auto' />
                     <p className="p-2 md:p-4 text-xs sm:text-sm md:w-1/2">
-                      You are minutes away from participating in the action.  Open an account within 15 minutes with the sportsbooks above to place your smart, logic-based, informed wagers.
-                    </p>
-                  </div>
-                </div>
-                <div className="m-2 flex">
-                  <div className='mx-2 h-fit rounded-lg min-w-56 w-full cursor-pointer md:flex' >
-                    <img src='imgs/banner (7).png' className='md:w-1/2 aspect-square rounded mx-auto' />
-                    <p className="p-2 md:p-4 text-xs sm:text-sm md:w-1/2">
-                      You are minutes away from participating in the action.  Open an account within 15 minutes with the sportsbooks above to place your smart, logic-based, informed wagers.
-                    </p>
-                  </div>
-                </div>
-                <div className="m-2 flex">
-                  <div className='mx-2 h-fit rounded-lg min-w-56 w-full cursor-pointer md:flex' >
-                    <img src='imgs/banner (2).png' className='md:w-1/2 aspect-square rounded mx-auto' />
-                    <p className="p-2 md:p-4 text-xs sm:text-sm md:w-1/2">
-                      You are minutes away from participating in the action.  Open an account within 15 minutes with the sportsbooks above to place your smart, logic-based, informed wagers.
-                    </p>
-                  </div>
-                </div>
-                <div className="m-2 flex">
-                  <div className='mx-2 h-fit rounded-lg min-w-56 w-full cursor-pointer md:flex' >
-                    <img src='imgs/banner (3).png' className='md:w-1/2 aspect-square rounded mx-auto' />
-                    <p className="p-2 md:p-4 text-xs sm:text-sm md:w-1/2">
-                      You are minutes away from participating in the action.  Open an account within 15 minutes with the sportsbooks above to place your smart, logic-based, informed wagers.
+                      {configData?.rightBanners[1].text}
                     </p>
                   </div>
                 </div>
