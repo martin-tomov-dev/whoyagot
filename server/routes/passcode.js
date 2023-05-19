@@ -180,7 +180,6 @@ router.post('/update/:id', function (req, res, next) {
                 }
             }
         );
-        console.log(status);
         request.addParameter('passcode', TYPES.NVarChar, passcode);
         request.addParameter('isactive', TYPES.NVarChar, status);
         request.addParameter('id', TYPES.Int, id);

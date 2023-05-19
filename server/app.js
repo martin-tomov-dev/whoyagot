@@ -12,7 +12,9 @@ const app = express();
 
 const service = require('./service.js');
 const util = require('./util.js');
+
 const usersRouter = require('./routes/users');
+const loginRouter = require('./routes/login');
 const passcodeRouter = require('./routes/passcode');
 // var dataRouter = require('./routes/data');
 const cron = require('node-cron');
@@ -29,7 +31,7 @@ app.use('/images', express.static('images'));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(session({
-  cookie: { maxAge: 60000 },
+  cookie: { maxAge: 3600000 },
   store: new session.MemoryStore,
   saveUninitialized: true,
   resave: 'true',
@@ -53,16 +55,30 @@ app.use(
     },
   })
 );
+
+const isAuthenticated = (req, res, next) => {
+  if (req.session.token) {
+    console.log('token>>',req.session.token);
+    // User is authenticated, call next() to proceed to the next middleware
+    return next();
+  }
+
+  // User is not authenticated, redirect to login page
+  res.redirect('/');
+};
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 
-app.use('/', usersRouter);
+app.use('/', loginRouter);
 
-app.use('/users', usersRouter);
-app.use('/passcode', passcodeRouter);
+app.use('/users', isAuthenticated, usersRouter);
+app.use('/passcode', isAuthenticated, passcodeRouter);
 // app.use('/data', dataRouter);
 // app.use('/howtouse', dataRouter);
+
+
 
 
 const PORT = process.env.PORT || 3001;

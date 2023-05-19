@@ -6,8 +6,11 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import Main from './pages/Main';
 import DataPage from './pages/DataPage';
+import withAuth from './hooks/withAuth'
 
 function App() {
+  const CustomData = withAuth(DataPage);
+
   return (
     <>
       <BrowserRouter>
@@ -16,7 +19,7 @@ function App() {
           <Route index element={<Main />} />
           <Route path='/data' element={
             <FilterContextProvider>
-              <DataPage />
+              <CustomData />
             </FilterContextProvider>
           } />
         </Routes>

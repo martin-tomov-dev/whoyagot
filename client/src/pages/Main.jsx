@@ -64,6 +64,8 @@ function Main() {
       })
         .then((result) => {
           if (result.data?.passcodeValid == true) {
+            localStorage.setItem('isAuthenticated', true);
+            localStorage.setItem('expireTime', (new Date().getTime() + (86400 * 1000)));
             toast.success('Passed successfully!');
             navigate('/data');
           } else {
