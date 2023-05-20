@@ -4,9 +4,10 @@
   "description": "wyg web application",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server/app.js",
-    "build": "cd client && npm install --legacy-peer-deps && npm run build",
-    "test": "echo \"Error: no test specified\" "
+    "test": "echo \"Error: no test specified\" ",
+    "backend": "nodemon server/app.js",
+    "frontend": "cd client && npm install --legacy-peer-deps && npm run build && npm start",
+    "start": "start npm run frontend && start npm run backend"
   },
   "author": "Mapa Development",
   "license": "ISC",
