@@ -108,7 +108,7 @@ function Datatable(props) {
 
   return (
     <Fragment>
-      <div className="d-flex flex-row-reverse">
+      <div className="flex justify-end">
         <Button
           type="button"
           variant="success"
@@ -136,7 +136,7 @@ function Datatable(props) {
         applyFilters={props.applyFilters}
       />
 
-      <div className="table-responsive">
+      <div className="table-responsive overflow-x-auto">
         <Table
           hover
           className={`fs-8 my-5 ${classes.custom_table}`}

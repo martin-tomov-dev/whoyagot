@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import Main from './pages/Main';
 import DataPage from './pages/DataPage';
+import PageThree from './pages/PageThree';
 import withAuth from './hooks/withAuth'
 
 function App() {
@@ -17,9 +18,10 @@ function App() {
         <ToastContainer position='top-right' />
         <Routes>
           <Route index element={<Main />} />
+          <Route path='/page-three' element={<PageThree />} />
           <Route path='/data' element={
             <FilterContextProvider>
-              <CustomData />
+              <DataPage />
             </FilterContextProvider>
           } />
         </Routes>
