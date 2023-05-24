@@ -2,21 +2,11 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import config from '../data.config.json';
-
-import classes from './Data.module.css';
-import { Button, Col, Row } from 'react-bootstrap';
-import Container from 'react-bootstrap/Container';
 import Datatable from '../components/Datatable';
 import useFetch from '../hooks/useFetch';
 import { useContext } from 'react';
 import { FilterContext } from '../context/FilterContext';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faBaseballBall,
-  faBasketball,
-  faFootball,
-  faHockeyPuck,
-} from '@fortawesome/free-solid-svg-icons';
+
 
 function DataPage() {
   const [matchData, setMatchData] = useState([]);
@@ -67,14 +57,14 @@ function DataPage() {
       // url: 'http://localhost:3001/api/getAggregatedData?sport=' + game,
       method: 'GET',
     })
-    .then((result) => {
-      if (result.status) {
-        setMatchData(result.data);
-        setUnfilterdData(result.data);
-      }
-    })
+      .then((result) => {
+        if (result.status) {
+          setMatchData(result.data);
+          setUnfilterdData(result.data);
+        }
+      })
   }, [fetchData, game]);
-  
+
   const applyFilters = () => {
     let filteredData = unfilterdData.filter((match) => {
       let show_match = false;
@@ -104,8 +94,9 @@ function DataPage() {
       <div className="w-full h-fit min-h-screen bg-black sm:pt-4 text-[#3cdf1f] relative" ref={main}>
         <div className="">
           <div className="flex justify-between">
-            <h1 className="sm:text-5xl text-3xl font-bold my-2 sm:pl-8 pl-4 py-2 cursor-pointer" onClick={() => { navigate('/') }} >WhoYaGot??</h1>
-            <div className="flex pr-4 ">
+            <h1 className="sm:text-5xl text-3xl font-bold my-2 sm:pl-8 pl-4 py-2 cursor-pointer"
+              onClick={() => { navigate('/') }} >Split Action</h1>
+            {/* <div className="flex pr-4 ">
               <img src="imgs/profile.png" className="w-12 h-12 rounded-full border-2 border-[#3cdf1f] mt-2 mr-2 cursor-pointer" onClick={() => setShowDropdown(true)} alt='' />
               {showDropdown &&
                 <div className='bg-[#1e2229] rounded absolute w-40 top-20 shadow-lg shadow-black py-2 right-4' ref={wrapperRef}>
@@ -116,9 +107,12 @@ function DataPage() {
                   </div>
                 </div>
               }
-            </div>
+            </div> */}
           </div>
-          <div className="bg-gradient-to-r from-[#3cdf1f] to-gray-900 h-10 w-full text-white rounded"></div>
+          <div className="bg-gradient-to-r from-[#3cdf1f] to-gray-900 h-10 w-full text-white rounded justify-end flex">
+            <button className="mr-4 text-[#3cdf1f] font-bold hover:opacity-70" onClick={() => { navigate('/page-three') }}>
+              Next</button>
+          </div>
         </div>
         {
           isLoading
@@ -154,93 +148,7 @@ function DataPage() {
                     </div> */}
                   </div>
                 </div>
-
-                <Container>
-                  <Row>
-                    <Row>
-                      <Col sm={12}>
-                        <div className={classes.button_container}>
-                          <Button
-                            type="button"
-                            variant="success"
-                            className={`mx-2 my-3 ${classes.custom_button}`}
-                            onClick={() => setGame('NBA')}
-                            style={{
-                              color: game !== 'NBA' ? 'white' : 'black',
-                            }}
-                          >
-                            <FontAwesomeIcon icon={faBasketball} />
-                            <span className="mx-1">NBA</span>
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="success"
-                            className={`mx-2 my-3 ${classes.custom_button}`}
-                            onClick={() => setGame('NFL')}
-                            style={{
-                              color: game !== 'NFL' ? 'white' : 'black',
-                            }}
-                          >
-                            <FontAwesomeIcon icon={faFootball} />
-                            <span className="mx-1">NFL</span>
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="success"
-                            className={`mx-2 my-3 ${classes.custom_button}`}
-                            onClick={() => setGame('NHL')}
-                            style={{
-                              color: game !== 'NHL' ? 'white' : 'black',
-                            }}
-                          >
-                            <FontAwesomeIcon icon={faHockeyPuck} />
-                            <span className="mx-1">NHL</span>
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="success"
-                            className={`mx-2 my-3 ${classes.custom_button}`}
-                            onClick={() => setGame('NCAAF')}
-                            style={{
-                              color: game !== 'NCAAF' ? 'white' : 'black',
-                            }}
-                          >
-                            <FontAwesomeIcon icon={faFootball} />
-                            <span className="mx-1">NCAAF</span>
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="success"
-                            className={`mx-2 my-3 ${classes.custom_button}`}
-                            onClick={() => setGame('NCAAB')}
-                            style={{
-                              color: game !== 'NCAAB' ? 'white' : 'black',
-                            }}
-                          >
-                            <FontAwesomeIcon icon={faBasketball} />
-                            <span className="mx-1">NCAAB</span>
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="success"
-                            className={`mx-2 my-3 ${classes.custom_button}`}
-                            onClick={() => setGame('MLB')}
-                            style={{
-                              color: game !== 'MLB' ? 'white' : 'black',
-                            }}
-                          >
-                            <FontAwesomeIcon icon={faBaseballBall} />
-                            <span className="mx-1">MLB</span>
-                          </Button>
-                        </div>
-                      </Col>
-                    </Row>
-                    <div className={classes.datatable_container}>
-                      <Datatable matches={matchData} applyFilters={applyFilters} />
-                    </div>
-                  </Row>
-                </Container>
-
+                <Datatable matches={matchData} applyFilters={applyFilters} setGame={setGame} game={game}/>
                 <div className="text-white mt-6 p-4 rounded text-sm sm:text-base text-justify">
                   WYG provides valuable sports wagering consensus data to utilize along with your other sports analysis.<br /><br />
 
@@ -278,22 +186,18 @@ function DataPage() {
                 </div>
               </div>
               <div className="sm:w-1/3 sm:mx-6 sm:block grid sm:grid-cols-1 grid-cols-2 text-[#aaa] mt-8">
-                <div className="m-2 flex">
-                  <div className='mx-2 h-fit rounded-lg min-w-56 w-full cursor-pointer md:flex' >
-                    <img src={configData?.rightBanners[0].src} className='md:w-1/2 aspect-square rounded mx-auto' />
-                    <p className="p-2 md:p-4 text-xs sm:text-sm md:w-1/2">
-                    {configData?.rightBanners[0].text}
-                    </p>
-                  </div>
-                </div>
-                <div className="m-2 flex">
-                  <div className='mx-2 h-fit rounded-lg min-w-56 w-full cursor-pointer md:flex' >
-                    <img src={configData?.rightBanners[1].src} className='md:w-1/2 aspect-square rounded mx-auto' />
-                    <p className="p-2 md:p-4 text-xs sm:text-sm md:w-1/2">
-                      {configData?.rightBanners[1].text}
-                    </p>
-                  </div>
-                </div>
+                {
+                  configData?.rightBanners?.map((val, ind) => (
+                    <div className="m-2 flex" key={ind}>
+                      <div className='mx-2 h-fit rounded-lg min-w-56 w-full cursor-pointer md:flex' >
+                        <img src={val?.src} className='md:w-1/2 aspect-square rounded mx-auto' />
+                        <p className="p-2 md:p-4 text-xs sm:text-sm md:w-1/2">
+                          {val?.text}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                }
               </div>
             </div>
         }

@@ -1,13 +1,19 @@
 import React, { Fragment, useRef, useState } from 'react';
 import { Table } from 'react-bootstrap';
-import Button from 'react-bootstrap/Button';
 import FilterModal from './FilterModal';
-
-import classes from './Datatable.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faBaseballBall,
+  faBasketball,
+  faFootball,
+  faHockeyPuck,
+} from '@fortawesome/free-solid-svg-icons';
+import classes from './Datatable.module.css';
 import { faFileExcel, faFilter } from '@fortawesome/free-solid-svg-icons';
 import Excel from 'exceljs';
 import { saveAs } from 'file-saver';
+import { Button, Col, Row } from 'react-bootstrap';
+import Container from 'react-bootstrap/Container';
 
 function Datatable(props) {
   const tableRef = useRef(null);
@@ -108,112 +114,189 @@ function Datatable(props) {
 
   return (
     <Fragment>
-      <div className="d-flex flex-row-reverse">
-        <Button
-          type="button"
-          variant="success"
-          className={`mx-2 my-3 ${classes.custom_button}`}
-          onClick={saveExcel}
-        >
-          <FontAwesomeIcon icon={faFileExcel} />
-          <span className="mx-1">Export excel</span>
-        </Button>
+      <Container>
+        <Row>
+          <div className="w-full overflow-auto flex justify-between">
+            <Button
+              type="button"
+              variant="success"
+              className={`${classes.custom_button}`}
+              onClick={() => props.setGame('NBA')}
+              style={{
+                color: props.game !== 'NBA' ? 'white' : 'black',
+              }}
+            >
+              <FontAwesomeIcon icon={faBasketball} />
+              <span className="mx-1">NBA</span>
+            </Button>
+            <Button
+              type="button"
+              variant="success"
+              className={`${classes.custom_button}`}
+              onClick={() => props.setGame('NFL')}
+              style={{
+                color: props.game !== 'NFL' ? 'white' : 'black',
+              }}
+            >
+              <FontAwesomeIcon icon={faFootball} />
+              <span className="mx-1">NFL</span>
+            </Button>
+            <Button
+              type="button"
+              variant="success"
+              className={`${classes.custom_button}`}
+              onClick={() => props.setGame('NHL')}
+              style={{
+                color: props.game !== 'NHL' ? 'white' : 'black',
+              }}
+            >
+              <FontAwesomeIcon icon={faHockeyPuck} />
+              <span className="mx-1">NHL</span>
+            </Button>
+            <Button
+              type="button"
+              variant="success"
+              className={`${classes.custom_button}`}
+              onClick={() => props.setGame('NCAAF')}
+              style={{
+                color: props.game !== 'NCAAF' ? 'white' : 'black',
+              }}
+            >
+              <FontAwesomeIcon icon={faFootball} />
+              <span className="mx-1">NCAAF</span>
+            </Button>
+            <Button
+              type="button"
+              variant="success"
+              className={`${classes.custom_button}`}
+              onClick={() => props.setGame('NCAAB')}
+              style={{
+                color: props.game !== 'NCAAB' ? 'white' : 'black',
+              }}
+            >
+              <FontAwesomeIcon icon={faBasketball} />
+              <span className="mx-1">NCAAB</span>
+            </Button>
+            <Button
+              type="button"
+              variant="success"
+              className={`${classes.custom_button}`}
+              onClick={() => props.setGame('MLB')}
+              style={{
+                color: props.game !== 'MLB' ? 'white' : 'black',
+              }}
+            >
+              <FontAwesomeIcon icon={faBaseballBall} />
+              <span className="mx-1">MLB</span>
+            </Button>
+            <Button
+              type="button"
+              variant="success"
+              className={`${classes.custom_button}`}
+              onClick={saveExcel}
+            >
+              <FontAwesomeIcon icon={faFileExcel} />
+              <span className="mx-1">Export excel</span>
+            </Button>
 
-        <Button
-          type="button"
-          variant="primary"
-          onClick={() => setModalShow(true)}
-          className={`mx-2 my-3 ${classes.custom_button}`}
-        >
-          <FontAwesomeIcon icon={faFilter} />
-          <span className="mx-1">Filter data</span>
-        </Button>
-      </div>
+            <Button
+              type="button"
+              variant="primary"
+              onClick={() => setModalShow(true)}
+              className={`${classes.custom_button}`}
+            >
+              <FontAwesomeIcon icon={faFilter} />
+              <span className="mx-1">Filter data</span>
+            </Button>
+          </div>
+          <div className={classes.datatable_container}>
+            <FilterModal
+              show={modalShow}
+              onHide={() => setModalShow(false)}
+              applyFilters={props.applyFilters}
+            />
 
-      <FilterModal
-        show={modalShow}
-        onHide={() => setModalShow(false)}
-        applyFilters={props.applyFilters}
-      />
-
-      <div className="table-responsive">
-        <Table
-          hover
-          className={`fs-8 my-5 ${classes.custom_table}`}
-          ref={tableRef}
-        >
-          <thead>
-            <tr>
-              <th>Timing</th>
-              <th>Team</th>
-              <th>Spread</th>
-              <th>% Bets</th>
-              <th>% Handle</th>
-              <th>ML</th>
-              <th>% Bets</th>
-              <th>% Handle</th>
-              <th>Total</th>
-              <th>% Bets</th>
-              <th>% Handle</th>
-              <th>Score</th>
-            </tr>
-          </thead>
-          <tbody>
-            {props.matches.map((match) =>
-              match[Object.keys(match)[0]].map((match_detail, index) => (
-                <tr
-                  key={match_detail.MatchId + '_' + index}
-                  style={{
-                    borderBottom: index === 1 ? '1px solid #757575' : '',
-                  }}
-                >
-                  {index === 0 && (
-                    <td
-                      className="text-center"
-                      rowSpan={2}
-                      style={{
-                        borderBottom: '1px solid #757575',
-                      }}
-                    >
-                      {new Date(match_detail.GameTime)
-                        .toDateString()
-                        .slice(0, -5)}
-                    </td>
+            <div className="table-responsive overflow-x-auto">
+              <Table
+                hover
+                className={`fs-8 my-5 w-full ${classes.custom_table}`}
+                ref={tableRef}
+              >
+                <thead>
+                  <tr>
+                    <th>Timing</th>
+                    <th>Team</th>
+                    <th>Spread</th>
+                    <th>% Bets</th>
+                    <th>% Handle</th>
+                    <th>ML</th>
+                    <th>% Bets</th>
+                    <th>% Handle</th>
+                    <th>Total</th>
+                    <th>% Bets</th>
+                    <th>% Handle</th>
+                    {/* <th>Score</th> */}
+                  </tr>
+                </thead>
+                <tbody>
+                  {props.matches.map((match) =>
+                    match[Object.keys(match)[0]].map((match_detail, index) => (
+                      <tr
+                        key={match_detail.MatchId + '_' + index}
+                        style={{
+                          borderBottom: index === 1 ? '1px solid #757575' : '',
+                        }}
+                      >
+                        {index === 0 && (
+                          <td
+                            className="text-center"
+                            rowSpan={2}
+                            style={{
+                              borderBottom: '1px solid #757575',
+                            }}
+                          >
+                            {new Date(match_detail.GameTime)
+                              .toDateString()
+                              .slice(0, -5)}
+                          </td>
+                        )}
+                        <td className={classes.team_cell}>
+                          <div
+                            className={classes.team_logo}
+                            style={{
+                              backgroundSize: 'cover',
+                              backgroundImage: `url(${match_detail.TeamLogo
+                                ? match_detail.TeamLogo
+                                : 'assets/images/blank-placeholder.jpg'
+                                })`,
+                            }}
+                          ></div>
+                          <b>{match_detail.TeamCode}</b>
+                        </td>
+                        <td className="text-center fw-bold">{match_detail.Spread}</td>
+                        <td className="text-center">{match_detail.SpreadBets}</td>
+                        <td className="text-center">{match_detail.SpreadHandled}</td>
+                        <td className="text-center fw-bold">
+                          {match_detail.Moneyline}
+                        </td>
+                        <td className="text-center">{match_detail.MoneylineBets}</td>
+                        <td className="text-center">
+                          {match_detail.MoneylineHandled}
+                        </td>
+                        <td className="text-center fw-bold">{match_detail.Total}</td>
+                        <td className="text-center">{match_detail.TotalBets}</td>
+                        <td className="text-center">{match_detail.TotalHandled}</td>
+                        {/* <td className="text-center fw-bold">{match_detail.Score}</td> */}
+                      </tr>
+                    ))
                   )}
-                  <td className={classes.team_cell}>
-                    <div
-                      className={classes.team_logo}
-                      style={{
-                        backgroundSize: 'cover',
-                        backgroundImage: `url(${
-                          match_detail.TeamLogo
-                            ? match_detail.TeamLogo
-                            : 'assets/images/blank-placeholder.jpg'
-                        })`,
-                      }}
-                    ></div>
-                    <b>{match_detail.TeamCode}</b>
-                  </td>
-                  <td className="text-center fw-bold">{match_detail.Spread}</td>
-                  <td className="text-center">{match_detail.SpreadBets}</td>
-                  <td className="text-center">{match_detail.SpreadHandled}</td>
-                  <td className="text-center fw-bold">
-                    {match_detail.Moneyline}
-                  </td>
-                  <td className="text-center">{match_detail.MoneylineBets}</td>
-                  <td className="text-center">
-                    {match_detail.MoneylineHandled}
-                  </td>
-                  <td className="text-center fw-bold">{match_detail.Total}</td>
-                  <td className="text-center">{match_detail.TotalBets}</td>
-                  <td className="text-center">{match_detail.TotalHandled}</td>
-                  <td className="text-center fw-bold">{match_detail.Score}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </Table>
-      </div>
+                </tbody>
+              </Table>
+            </div>
+          </div>
+        </Row>
+      </Container>
+
     </Fragment>
   );
 }
