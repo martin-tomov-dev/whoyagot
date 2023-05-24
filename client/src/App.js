@@ -10,7 +10,8 @@ import PageThree from './pages/PageThree';
 import withAuth from './hooks/withAuth'
 
 function App() {
-  const CustomData = withAuth(DataPage);
+  const AuthDataPage = withAuth(DataPage);
+  const AuthPageThree = withAuth(PageThree);
 
   return (
     <>
@@ -21,7 +22,8 @@ function App() {
           <Route path='/page-three' element={<PageThree />} />
           <Route path='/data' element={
             <FilterContextProvider>
-              <DataPage />
+              <AuthDataPage />
+              <AuthPageThree />
             </FilterContextProvider>
           } />
         </Routes>

@@ -58,7 +58,7 @@ app.use(
 
 const isAuthenticated = (req, res, next) => {
   if (req.session.token) {
-    console.log('token>>',req.session.token);
+    console.log('token>>', req.session.token);
     // User is authenticated, call next() to proceed to the next middleware
     return next();
   }
@@ -113,7 +113,7 @@ app.post('/api/subscribe', (req, res) => {
       res.status(200).send({ message: 'success' });
     },
     (err) => {
-      res.status(500).send({ message: 'Duplicated Userinfo!' });
+      res.status(500).send({ message: 'Duplicated Userinfo!', passcode: 'ABCD' });
     }
   ).catch((err) => res.status(403).send(util.getResponse(err, false)));
 });

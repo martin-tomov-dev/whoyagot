@@ -42,7 +42,7 @@ function Main() {
         .then((result) => {
           if (result.message === 'success') {
             setShowModal(false);
-            toast.success('Subscribed successfully! Please check your email.');
+            toast.success(`Subscribed successfully! Your Passcode is${result?.passcode}`);
           } else {
             toast.error(result.message);
           }
@@ -114,7 +114,7 @@ function Main() {
 
       <div className="w-full h-fit min-h-screen bg-black sm:py-4 sm:px-20 text-[#3cdf1f] relative" ref={main}>
         <div className="flex justify-between">
-          <h1 className="sm:text-5xl text-3xl font-bold my-2 sm:pl-8 pl-4 py-2 cursor-pointer" onClick={() => { navigate('/') }} >WhoYaGot??</h1>
+          <h1 className="sm:text-5xl text-3xl font-bold my-2 sm:pl-8 pl-4 py-2 cursor-pointer" onClick={() => { navigate('/') }} >Split Action</h1>
           {/* <div className="flex">
             <p className="p-5">Vlady Slav</p>
             <img src="imgs/profile.png" className="w-12 h-12 rounded-full border-2 border-[#3cdf1f] mt-2 mr-2" />
@@ -127,7 +127,7 @@ function Main() {
             <img src="imgs/Football.png" alt="" />
             <img src="imgs/Basketball.png" className="sm:my-4" alt="" />
             <img src="imgs/Baseball.png" className="sm:my-4" alt="" />
-            <img src="imgs/Puck.jpg" className="sm:my-4" width={350} alt="" />
+            <img src="imgs/Hockey.PNG" className="sm:my-4" width={350} alt="" />
           </div>
           <div className="w-full">
             <p className="sm:text-3xl text-2xl mt-4 px-4 sm:px-10 text-center">Up your game on Sports Wagering</p>

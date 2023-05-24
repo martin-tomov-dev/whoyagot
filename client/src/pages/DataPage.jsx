@@ -2,21 +2,11 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import config from '../data.config.json';
-
-import classes from './Data.module.css';
-import { Button, Col, Row } from 'react-bootstrap';
-import Container from 'react-bootstrap/Container';
 import Datatable from '../components/Datatable';
 import useFetch from '../hooks/useFetch';
 import { useContext } from 'react';
 import { FilterContext } from '../context/FilterContext';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faBaseballBall,
-  faBasketball,
-  faFootball,
-  faHockeyPuck,
-} from '@fortawesome/free-solid-svg-icons';
+
 
 function DataPage() {
   const [matchData, setMatchData] = useState([]);
@@ -102,7 +92,7 @@ function DataPage() {
         <div className="">
           <div className="flex justify-between">
             <h1 className="sm:text-5xl text-3xl font-bold my-2 sm:pl-8 pl-4 py-2 cursor-pointer"
-              onClick={() => { navigate('/') }} >WhoYaGot??</h1>
+              onClick={() => { navigate('/') }} >Split Action</h1>
             {/* <div className="flex pr-4 ">
               <img src="imgs/profile.png" className="w-12 h-12 rounded-full border-2 border-[#3cdf1f] mt-2 mr-2 cursor-pointer" onClick={() => setShowDropdown(true)} alt='' />
               {showDropdown &&
@@ -155,93 +145,7 @@ function DataPage() {
                     </div> */}
                   </div>
                 </div>
-
-                <Container>
-                  <Row>
-                    <Row className="w-full overflow-auto">
-                      <Col sm={12}>
-                        <div className={classes.button_container}>
-                          <Button
-                            type="button"
-                            variant="success"
-                            className={`mx-2 my-3 ${classes.custom_button}`}
-                            onClick={() => setGame('NBA')}
-                            style={{
-                              color: game !== 'NBA' ? 'white' : 'black',
-                            }}
-                          >
-                            <FontAwesomeIcon icon={faBasketball} />
-                            <span className="mx-1">NBA</span>
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="success"
-                            className={`mx-2 my-3 ${classes.custom_button}`}
-                            onClick={() => setGame('NFL')}
-                            style={{
-                              color: game !== 'NFL' ? 'white' : 'black',
-                            }}
-                          >
-                            <FontAwesomeIcon icon={faFootball} />
-                            <span className="mx-1">NFL</span>
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="success"
-                            className={`mx-2 my-3 ${classes.custom_button}`}
-                            onClick={() => setGame('NHL')}
-                            style={{
-                              color: game !== 'NHL' ? 'white' : 'black',
-                            }}
-                          >
-                            <FontAwesomeIcon icon={faHockeyPuck} />
-                            <span className="mx-1">NHL</span>
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="success"
-                            className={`mx-2 my-3 ${classes.custom_button}`}
-                            onClick={() => setGame('NCAAF')}
-                            style={{
-                              color: game !== 'NCAAF' ? 'white' : 'black',
-                            }}
-                          >
-                            <FontAwesomeIcon icon={faFootball} />
-                            <span className="mx-1">NCAAF</span>
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="success"
-                            className={`mx-2 my-3 ${classes.custom_button}`}
-                            onClick={() => setGame('NCAAB')}
-                            style={{
-                              color: game !== 'NCAAB' ? 'white' : 'black',
-                            }}
-                          >
-                            <FontAwesomeIcon icon={faBasketball} />
-                            <span className="mx-1">NCAAB</span>
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="success"
-                            className={`mx-2 my-3 ${classes.custom_button}`}
-                            onClick={() => setGame('MLB')}
-                            style={{
-                              color: game !== 'MLB' ? 'white' : 'black',
-                            }}
-                          >
-                            <FontAwesomeIcon icon={faBaseballBall} />
-                            <span className="mx-1">MLB</span>
-                          </Button>
-                        </div>
-                      </Col>
-                    </Row>
-                    <div className={classes.datatable_container}>
-                      <Datatable matches={matchData} applyFilters={applyFilters} />
-                    </div>
-                  </Row>
-                </Container>
-
+                <Datatable matches={matchData} applyFilters={applyFilters} setGame={setGame} game={game}/>
                 <div className="text-white mt-6 p-4 rounded text-sm sm:text-base text-justify">
                   WYG provides valuable sports wagering consensus data to utilize along with your other sports analysis.<br /><br />
 

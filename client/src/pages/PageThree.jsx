@@ -15,7 +15,7 @@ function PageThree() {
         <div className="">
           <div className="flex justify-between">
             <h1 className="sm:text-5xl text-3xl font-bold my-2 sm:pl-8 pl-4 py-2 cursor-pointer"
-              onClick={() => { navigate('/') }} >WhoYaGot??</h1>
+              onClick={() => { navigate('/') }} >Split Action</h1>
           </div>
           <div className="bg-gradient-to-r from-[#3cdf1f] to-gray-900 h-10 w-full text-white rounded justify-end flex">
             <button className="mr-4 text-[#3cdf1f] font-bold hover:opacity-70" onClick={() => { navigate('/data') }}>
