@@ -23,8 +23,6 @@ function DataPage() {
   const navigate = useNavigate();
   const wrapperRef = useRef(null);
 
-  const domain = process.env.DOMAIN;
-
   const useOutsideAlerter = (ref) => {
     useEffect(() => {
       /**
@@ -53,7 +51,7 @@ function DataPage() {
   // Retrieve game information
   useEffect(() => {
     fetchData({
-      url: domain + '/api/getAggregatedData?sport=' + game,
+      url: '/api/getAggregatedData?sport=' + game,
       // url: 'http://localhost:3001/api/getAggregatedData?sport=' + game,
       method: 'GET',
     })
