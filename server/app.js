@@ -78,7 +78,7 @@ app.use('/passcode', isAuthenticated, passcodeRouter);
 // app.use('/data', dataRouter);
 // app.use('/howtouse', dataRouter);
 
-const PORT = process.env.PORT; // || 3001;
+const PORT = process.env.PORT || 3001;
 const DIR = './assets/images/';
 
 const storage = multer.diskStorage({

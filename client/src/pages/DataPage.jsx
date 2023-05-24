@@ -51,8 +51,7 @@ function DataPage() {
   // Retrieve game information
   useEffect(() => {
     fetchData({
-      url: '/api/getAggregatedData?sport=' + game,
-      // url: 'http://localhost:3001/api/getAggregatedData?sport=' + game,
+      url: 'http://localhost:3001/api/getAggregatedData?sport=' + game,
       method: 'GET',
     })
       .then((result) => {

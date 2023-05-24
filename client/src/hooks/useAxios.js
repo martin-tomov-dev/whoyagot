@@ -6,8 +6,7 @@ export function useAxios() {
   //const dispatch = useAuthDispatch();
   
   
-  //axios.defaults.baseURL = 'http://localhost:3000';
-  axios.defaults.baseURL = 'https://splitaction-01.azurewebsites.net:443';
+  axios.defaults.baseURL = 'http://localhost:3000';
   
   //axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;
   axios.defaults.headers.post["Content-Type"] =

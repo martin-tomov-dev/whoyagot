@@ -35,8 +35,7 @@ function Main() {
       toast.warn('Email type is invalid');
     } else {
       fetchData({
-        url: '/api/subscribe',
-        //url: 'http://localhost:3001/api/subscribe',
+        url: 'http://localhost:3001/api/subscribe',
         body: { ...subscribeInfo },
         method: 'POST',
       })
@@ -60,8 +59,7 @@ function Main() {
       toast.warn('You should confirm that you are over 18 years old');
     } else {
       fetchData({
-        url: '/api/passcodeLogin?passcode=' + passCode,
-        //url: 'http://localhost:3001/api/passcodeLogin?passcode=' + passCode,
+        url: 'http://localhost:3001/api/passcodeLogin?passcode=' + passCode,
         method: 'GET',
       })
         .then((result) => {
