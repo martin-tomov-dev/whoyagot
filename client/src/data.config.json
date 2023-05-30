@@ -1,40 +1,70 @@
 {
     "DataPage": {
         "middleBanners": [
-            "/imgs/middle-banner (1).jpg",
-            "/imgs/middle-banner (2).jpg"
+            {
+                "src": "/imgs/BetOnline.JPG",
+                "href": "https://record.commissionkings.ag/_-upPomnA17xSV99Idi_0lWNd7ZgqdRLk/1/"
+            },
+            {
+                "src": "/imgs/MyBookie.jpg",
+                "href": "https://record.webpartners.co/_HFx3XJRH2msWqcfzuvZcQGNd7ZgqdRLk/1/"
+            }
         ],
         "rightBanners": [
             {
-                "src":"/imgs/right-banner (1).jpg",
-                "text":"Tired of the 9-5? Be your own boss by starting your own company today. Incfile makes starting your company easy. Find out more here."
+                "src": "/imgs/Green Roads.jpg",
+                "text": "Sleep, Relax, Focus.   Green Roads offers premium CBD & THC products.  Use coupon code Action15 for 15% off.   leave this off for now until I get confirmation from Green Raods.",
+                "href": "https://greenroads.com/?oid=2&affid=669&utm_campaign=referral&utm_medium=performance&utm_source=everflow"
             },
             {
-                "src": "/imgs/right-banner (2).jpg",
-                "text":"Sleep, Relax, Focus.   Green Roads offers boh THC and CBD product.   Use Code 'WYG15' for 15% off your first order."
+                "src": "/imgs/Bulk Supplements.jpg",
+                "text":"Experience the power of clean, pure nurition with BulkSupplements.   Great for reaching your goals and maintaining a healthy lifestyle.",
+                "href":"https://www.shareasale.com/r.cfm?b=602574&u=3407588&m=53326"
+            },
+            {
+                "src": "/imgs/IncFile.jpg",
+                "text":"Tired of the 9-5?   Be your own boss by starting your own company today.  IncFile makes starting your company easy.  Find out more here.",
+                "href":"https://www.shareasale.com/r.cfm?b=617326&u=3407588&m=53954"
+            },
+            {
+                "src": "/imgs/Chase.jpg",
+                "text":" Earn 60,000 bonus points after you spend $4,000 on purchases in the first 3 months from account opening, that's $900 when redeemed for travel through Chase Ultimate Rewards",
+                "href":"https://www.referyourchasecard.com/19j/29PC8HGA61"
             }
-           
-        ],
-        "text": "sample text",
-        "link": "https://example.com"
+        ]
     },
     "PageThree": {
         "middleBanners": [
-            "/imgs/middle-banner (1).jpg",
-            "/imgs/middle-banner (2).jpg"
+            {
+                "src": "/imgs/BetOnline.JPG",
+                "href": "https://record.commissionkings.ag/_-upPomnA17xSV99Idi_0lWNd7ZgqdRLk/1/"
+            },
+            {
+                "src": "/imgs/MyBookie.jpg",
+                "href": "https://record.webpartners.co/_HFx3XJRH2msWqcfzuvZcQGNd7ZgqdRLk/1/"
+            }
         ],
         "rightBanners": [
             {
-                "src":"/imgs/right-banner (1).jpg",
-                "text":"Tired of the 9-5? Be your own boss by starting your own company today. Incfile makes starting your company easy. Find out more here."
+                "src": "/imgs/Green Roads.jpg",
+                "text": "Sleep, Relax, Focus.   Green Roads offers premium CBD & THC products.  Use coupon code Action15 for 15% off.   leave this off for now until I get confirmation from Green Raods.",
+                "href": "https://greenroads.com/?oid=2&affid=669&utm_campaign=referral&utm_medium=performance&utm_source=everflow"
             },
             {
-                "src": "/imgs/right-banner (2).jpg",
-                "text":"Sleep, Relax, Focus.   Green Roads offers boh THC and CBD product.   Use Code 'WYG15' for 15% off your first order."
+                "src": "/imgs/Bulk Supplements.jpg",
+                "text":"Experience the power of clean, pure nurition with BulkSupplements.   Great for reaching your goals and maintaining a healthy lifestyle.",
+                "href":"https://www.shareasale.com/r.cfm?b=602574&u=3407588&m=53326"
+            },
+            {
+                "src": "/imgs/IncFile.jpg",
+                "text":"Tired of the 9-5?   Be your own boss by starting your own company today.  IncFile makes starting your company easy.  Find out more here.",
+                "href":"https://www.shareasale.com/r.cfm?b=617326&u=3407588&m=53954"
+            },
+            {
+                "src": "/imgs/Chase.jpg",
+                "text":" Earn 60,000 bonus points after you spend $4,000 on purchases in the first 3 months from account opening, that's $900 when redeemed for travel through Chase Ultimate Rewards",
+                "href":"https://www.referyourchasecard.com/19j/29PC8HGA61"
             }
-           
-        ],
-        "text": "sample text",
-        "link": "https://example.com"
+        ]
     }
 }

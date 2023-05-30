@@ -12,7 +12,7 @@ import classes from './Datatable.module.css';
 import { faFileExcel, faFilter } from '@fortawesome/free-solid-svg-icons';
 import Excel from 'exceljs';
 import { saveAs } from 'file-saver';
-import { Button, Col, Row } from 'react-bootstrap';
+import { Button, Row } from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
 
 function Datatable(props) {

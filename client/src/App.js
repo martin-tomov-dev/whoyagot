@@ -19,11 +19,10 @@ function App() {
         <ToastContainer position='top-right' />
         <Routes>
           <Route index element={<Main />} />
-          <Route path='/page-three' element={<PageThree />} />
+          <Route path='/page-three' element={<AuthPageThree />} />
           <Route path='/data' element={
             <FilterContextProvider>
               <AuthDataPage />
-              <AuthPageThree />
             </FilterContextProvider>
           } />
         </Routes>
