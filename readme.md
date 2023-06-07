@@ -1,4 +1,6 @@
-# WhoYaGot
+# SplitAction
+
+# Email me at mario@mapadevelopment.com for access to Azure.
 
 Repo containing the code for WhoYaGot web application.
 
