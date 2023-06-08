@@ -8,7 +8,7 @@
     "backend": "nodemon server/app.js",
     "frontend": "cd client && npm install --legacy-peer-deps && npm run build && npm start",
     "dev": "start npm run frontend && start npm run backend",
-    "start": "node server/app.js"
+    "start": "node build1/app.js"
   },
   "author": "Mapa Development",
   "license": "ISC",
