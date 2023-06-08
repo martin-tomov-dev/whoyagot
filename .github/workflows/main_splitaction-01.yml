@@ -52,5 +52,5 @@ jobs:
         with:
           app-name: 'splitaction-01'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_7AB3FAD3C4884BECBF8D267B114C67D1 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AD5984E47CE34021A0C33E720B46136D }}
           package: .
