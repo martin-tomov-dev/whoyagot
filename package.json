@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" ",
     "backend": "nodemon server/app.js",
     "frontend": "cd client && npm install --legacy-peer-deps && npm run build && npm start",
-    "start": "start npm run frontend && start npm run backend"
+    "dev": "start npm run frontend && start npm run backend",
+    "start": "nodemon server/app.js"
   },
   "author": "Mapa Development",
   "license": "ISC",
